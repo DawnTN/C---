@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include<QDate>
 #include "lunardata.h"
+#include "sunorbit.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,7 +31,7 @@ private slots:
     void on_querryBotton_clicked();
     void prevMonth();
     void nextMonth();
-
+    void onSunTimeChanged(float hour);
 
 
 private:
@@ -41,6 +42,6 @@ private:
     int currentDisplayYear;
     int currentDisplayMonth;
 
-
+    QColor lerpColor(const QColor &a, const QColor &b, float t);
 };
 #endif // MAINWINDOW_H

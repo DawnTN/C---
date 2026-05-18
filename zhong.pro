@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     lunarcalendar.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sunorbit.cpp
 
 HEADERS += \
     lunardata.h \
-    mainwindow.h
+    mainwindow.h \
+    sunorbit.h
 
 FORMS += \
     mainwindow.ui

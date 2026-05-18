@@ -1,13 +1,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "lunardata.h"
+
 #include<QMessageBox>
 #include<QDebug>
+#include<QColor>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // ===== 新增：太阳轨道初始化 =====
+        connect(ui->sunOrbitWidget, &SunOrbit::timeChanged, this, &MainWindow::onSunTimeChanged);
+        float currentHour = QTime::currentTime().hour() + QTime::currentTime().minute() / 60.0f;
+        ui
+    ->sunOrbitWidget->setTime(currentHour);
+        // ===== 太阳轨道结束 =====
 
     timer=new QTimer(this);
     connect(timer,&QTimer::timeout,this,&MainWindow::updateTime);
@@ -39,17 +48,28 @@ MainWindow::~MainWindow()
 void MainWindow::updateTime()//载入本地时间
 {
     QDateTime now=QDateTime::currentDateTime();
-    QString timeStr=now.toString("hh:mm:ss");
+
     QString dateStr=now.toString("yyyy_M_dd");
     QString weekStr=now.toString("dddd");
+    QString timeStr = now.toString("hh:mm:ss");
+
+    // 秒针闪烁效果：奇数秒冒号变空格
+    if (now.time().second() % 2 == 1) {
+        timeStr.replace(":", " ");
+    }
+
     ui->timeLabel->setText(timeStr);
     ui->datelabel->setText(dateStr);
     ui->weekLabel->setText(weekStr);
-    QString lunarStr
-    = LunarCalendar::getLunarDate(now.date().year(), now.date().month(), now.date().day());
 
+    QString lunarStr = LunarCalendar::getLunarDate(now.date().year(), now.date().month(), now.date().day());
     ui->lunarlabel->setText("农历："+lunarStr);
+
+    // 同步背景色和文字颜色（按当前真实时间）
+    float currentHour = now.time().hour() + now.time().minute() / 60.0f;
+    onSunTimeChanged(currentHour);
 }
+
 void MainWindow::queryCalendar()//排序填表
 {
     int year=ui->yearEdit->text().toInt();
@@ -140,6 +160,69 @@ void MainWindow::nextMonth()
 }
 
 
+// 颜色插值：在颜色a和颜色b之间平滑过渡（t=0是a，t=1是b）
+QColor MainWindow::lerpColor(const QColor &a, const QColor &b, float t)
+{
+    int r = a.red()   + (b.red()   - a.red())   * t;
+    int g = a.green() + (b.green() - a.green()) * t;
+    int bl = a.blue()  + (b.blue()  - a.blue())  * t;
+    return QColor(r, g, bl);
+}
+
+void MainWindow::onSunTimeChanged(float hour)
+{
 
 
+    // 局部颜色插值函数
+    auto lerpColor = [](const QColor &a, const QColor &b, float t) -> QColor {
+        int r = a.red()   + (b.red()   - a.red())   * t;
+        int g = a.green() + (b.green() - a.green()) * t;
+        int bl = a.blue()  + (b.blue()  - a.blue())  * t;
+        return QColor(r, g, bl);
+    };
 
+    // 淡色系节点（马卡龙/奶油色）
+    static const float nodeHours[] = {
+        0.0f, 4.0f, 6.0f, 9.0f, 12.0f, 15.0f, 18.0f, 20.0f, 22.0f, 24.0f
+    };
+    static const QColor nodeColors[] = {
+        QColor(176, 196, 222),   // 0点  深夜：淡钢蓝（明显一点）
+        QColor(147, 112, 219),   // 4点  凌晨：淡紫（明显）
+        QColor(255, 160, 122),   // 6点  日出：淡珊瑚（明显）
+        QColor(135, 206, 235),   // 9点  上午：天蓝（明显）
+        QColor(144, 238, 144),   // 12点 正午：淡绿（明显）
+        QColor(173, 216, 230),   // 15点 下午：淡蓝（明显）
+        QColor(255, 218, 185),   // 18点 黄昏：蜜桃（明显）
+        QColor(221, 160, 221),   // 20点 日落：淡紫（明显）
+        QColor(106, 90, 205),    // 22点 晚上：石板蓝（明显）
+        QColor(176, 196, 222)    // 24点 深夜：淡钢蓝
+    };
+    const int nodeCount = 10;
+
+    // 计算背景色
+    QColor bgColor(232, 240, 250);
+    for (int i = 0; i < nodeCount - 1; i++) {
+        if (hour >= nodeHours[i] && hour <= nodeHours[i+1]) {
+            float t = (hour - nodeHours[i]) / (nodeHours[i+1] - nodeHours[i]);
+            bgColor = lerpColor(nodeColors[i], nodeColors[i+1], t);
+            break;
+        }
+    }
+
+    // 判断背景亮度，选文字颜色
+    int brightness = (bgColor.red() * 299 + bgColor.green() * 587 + bgColor.blue() * 114) / 1000;
+    QString textColor = (brightness > 180) ? "#5D6D7E" : "#FFFFFF";
+
+    // ===== 终极背景色方案：直接操作 centralWidget =====
+    QWidget *cw = this->centralWidget();  // Qt官方方法，不需要知道Designer里的名字
+    if (cw) {
+        cw->setStyleSheet(QString(
+            "background-color: %1;"
+        ).arg(bgColor.name()));
+    }
+
+    // 时间文字颜色
+    ui->timeLabel->setStyleSheet(QString(
+        "color: %1; font-weight: bold;"
+    ).arg(textColor));
+}

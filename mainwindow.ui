@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>297</width>
-    <height>521</height>
+    <width>400</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <widget class="QLabel" name="datelabel">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>140</x>
       <y>120</y>
       <width>101</width>
       <height>40</height>
@@ -55,7 +55,7 @@
    <widget class="QLabel" name="weekLabel">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>40</x>
       <y>120</y>
       <width>71</width>
       <height>40</height>
@@ -74,9 +74,9 @@
    <widget class="QLineEdit" name="yearEdit">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>90</x>
       <y>160</y>
-      <width>101</width>
+      <width>91</width>
       <height>21</height>
      </rect>
     </property>
@@ -84,9 +84,9 @@
    <widget class="QPushButton" name="querryBotton">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>190</x>
       <y>160</y>
-      <width>51</width>
+      <width>41</width>
       <height>61</height>
      </rect>
     </property>
@@ -105,17 +105,17 @@
      <rect>
       <x>25</x>
       <y>229</y>
-      <width>210</width>
-      <height>230</height>
+      <width>211</width>
+      <height>241</height>
      </rect>
     </property>
    </widget>
    <widget class="QSpinBox" name="monthEdit">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>90</x>
       <y>190</y>
-      <width>60</width>
+      <width>81</width>
       <height>30</height>
      </rect>
     </property>
@@ -134,7 +134,7 @@
      <rect>
       <x>30</x>
       <y>180</y>
-      <width>80</width>
+      <width>51</width>
       <height>30</height>
      </rect>
     </property>
@@ -147,7 +147,7 @@
      <rect>
       <x>30</x>
       <y>150</y>
-      <width>80</width>
+      <width>51</width>
       <height>30</height>
      </rect>
     </property>
@@ -194,8 +194,26 @@
      <string>农历：乙巳年三月初二</string>
     </property>
    </widget>
+   <widget class="SunOrbit" name="sunOrbitWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>480</y>
+      <width>400</width>
+      <height>200</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SunOrbit</class>
+   <extends>QWidget</extends>
+   <header>sunorbit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
